@@ -95,7 +95,7 @@ public class Dag7 {
 			}
 			int max = map.values().stream().max(Integer::compareTo).get();
 
-			if (joker && map.containsKey('J') && map.get('J') != 5) {
+			if (joker && map.containsKey('J') && max != 5) {
 				int maxWithoutJ = map.entrySet().stream().filter(entry -> entry.getKey() != 'J')
 						.map(entry -> entry.getValue()).max(Integer::compareTo).get();
 				if (maxWithoutJ != 1) {
@@ -142,13 +142,13 @@ public class Dag7 {
 
 		private int twoPairOrOnePair(Map<Character, Integer> map) {
 			if (joker && map.containsKey('J')) {
-				if ((map.values().stream().filter(x -> x == 2).count() + 1) == 1) {
+				if (map.values().stream().filter(x -> x == 2).count() == 0) {
 					return ONE_PAIR;
 				}
 				return TWO_PAIR;
 			}
 
-			if ((int) (map.values().stream().filter(x -> x == 2).count()) == 1) {
+			if (map.values().stream().filter(x -> x == 2).count() == 1) {
 				return ONE_PAIR;
 			}
 			return TWO_PAIR;
