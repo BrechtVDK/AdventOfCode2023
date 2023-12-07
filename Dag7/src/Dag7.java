@@ -31,7 +31,7 @@ public class Dag7 {
 			totalWinnings1 += listOfHands1.get(i).getBid() * (i + 1);
 		}
 
-		/*testtest
+		/*
 		 * for (Hand1 h : listOfHands1) { System.out.println(h); }
 		 */
 		System.out.println("total winnings part 1: " + totalWinnings1);
