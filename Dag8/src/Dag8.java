@@ -1,5 +1,4 @@
 import java.io.File;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,13 +16,13 @@ public class Dag8 {
 
 	public Dag8() {
 		readFile();
-		int steps = navigate1();
+		int steps = navigate("AAA","ZZZ");
 		System.out.println("steps part 1: " + steps);
 
 		List<Long> firstNumberOfStepsForMatchOfNodesEndingWithA = new ArrayList<>();
 		for (String key : map.keySet()) {
 			if (key.matches("..A")) {
-				firstNumberOfStepsForMatchOfNodesEndingWithA.add((long) navigate2(key));
+				firstNumberOfStepsForMatchOfNodesEndingWithA.add((long) navigate(key,"..Z"));
 			}
 		}
 
@@ -43,29 +42,11 @@ public class Dag8 {
 		return lcm;
 	}
 
-	private int navigate1() {
-		String node = "AAA";
-		int steps = 0;
-		while (!node.equals("ZZZ")) {
-			for (int i = 0; i < instructions.length(); i++) {
-				steps++;
-				char instruction = instructions.charAt(i);
-				switch (instruction) {
-				case 'L' -> node = map.get(node)[0];
-				case 'R' -> node = map.get(node)[1];
-				}
-				if (node.equals("ZZZ")) {
-					break;
-				}
-			}
-		}
-		return steps;
-	}
 
-	private int navigate2(String startNode) {
+	private int navigate(String startNode, String endNode) {
 		String node = startNode;
 		int steps = 0;
-		while (!node.matches("..Z")) {
+		while (!node.matches(endNode)) {
 			for (int i = 0; i < instructions.length(); i++) {
 				steps++;
 				char instruction = instructions.charAt(i);
@@ -73,7 +54,7 @@ public class Dag8 {
 				case 'L' -> node = map.get(node)[0];
 				case 'R' -> node = map.get(node)[1];
 				}
-				if (node.matches("..Z")) {
+				if (node.matches(endNode)) {
 					break;
 				}
 			}
