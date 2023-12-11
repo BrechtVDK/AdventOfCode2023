@@ -24,16 +24,16 @@ public class Dag11 {
 		readFile();
 		calculateEmptyRows();
 		calculateEmptyColumns();
+
+		System.out.print("Empty rows: ");
+		emptyRows.forEach(x -> System.out.print(x + " "));
+		System.out.printf("%nEmpty cols: ");
+		emptyColumns.forEach(x -> System.out.print(x + " "));
+
 		mapGalaxies();
 		linkTheGalaxies();
-		System.out.print("Empty rows: ");
-		emptyRows.forEach(x -> System.out.print(x+" ") );
-		System.out.printf("%nEmpty cols: ");
-		emptyColumns.forEach(x -> System.out.print(x+" ") );
-		System.out.println();
 		long sum1 = calculateSumShortestPaths(2);
-		System.out.printf("Sum part 1: %d%n", sum1);
-		
+		System.out.printf("%nSum part 1: %d%n", sum1);
 		long sum2 = calculateSumShortestPaths(1000000);
 		System.out.printf("Sum part 2: %d%n", sum2);
 
@@ -67,17 +67,13 @@ public class Dag11 {
 	}
 
 	private long calculateSumShortestPaths(int expandFactor) {
-		long sum = 0;
-		for (int[] galaxyPair : galaxyPairs) {
-			sum += shortestPath(galaxyPair, expandFactor);
-		}
-		return sum;
+		return galaxyPairs.stream().mapToLong(galaxyPair -> shortestPath(galaxyPair, expandFactor)).reduce(Long::sum)
+				.getAsLong();
 	}
 
 	private int shortestPath(int[] galaxyPair, int expandFactor) {
 		int[] coord1 = galaxyMap.get(galaxyPair[0]);
 		int[] coord2 = galaxyMap.get(galaxyPair[1]);
-
 		int nrEmptycolumns = 0, nrEmptyRows = 0;
 
 		for (Integer row : emptyRows) {
@@ -90,9 +86,11 @@ public class Dag11 {
 				nrEmptycolumns++;
 			}
 		}
-		
-		int path = Math.abs(coord2[0] - coord1[0]) + Math.abs(coord2[1] - coord1[1])+(nrEmptycolumns*(expandFactor-1))+(nrEmptyRows*(expandFactor-1));
-		//System.out.printf("%d-%d %d-%d = %d #row %d #col %d%n",coord1[0],coord1[1], coord2[0],coord2[1],path,nrEmptyRows,nrEmptycolumns);
+
+		int path = Math.abs(coord2[0] - coord1[0]) + Math.abs(coord2[1] - coord1[1])
+				+ (nrEmptycolumns * (expandFactor - 1)) + (nrEmptyRows * (expandFactor - 1));
+		// System.out.printf("%d-%d %d-%d = %d #row %d #col %d%n",coord1[0],coord1[1],
+		// coord2[0],coord2[1],path,nrEmptyRows,nrEmptycolumns);
 		return path;
 
 	}
@@ -125,6 +123,5 @@ public class Dag11 {
 		} catch (Exception e) {
 			System.err.print(e);
 		}
-
 	}
 }
