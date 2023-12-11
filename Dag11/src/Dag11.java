@@ -15,96 +15,33 @@ public class Dag11 {
 	}
 
 	private List<String> imageList = new ArrayList<>();
-	private char[][] image;
 	private Map<Integer, int[]> galaxyMap = new TreeMap<>();
 	private List<int[]> galaxyPairs = new ArrayList<>();
+	private List<Integer> emptyRows = new ArrayList<>();
+	private List<Integer> emptyColumns = new ArrayList<>();
 
 	public Dag11() {
 		readFile();
-		expandEmptyRows();
-		expandEmptyColumns();
-		transformListToDoubleArray();
+		calculateEmptyRows();
+		calculateEmptyColumns();
 		mapGalaxies();
 		linkTheGalaxies();
-		long sum = calculateSumShortestPaths();
+		System.out.print("Empty rows: ");
+		emptyRows.forEach(x -> System.out.print(x+" ") );
+		System.out.printf("%nEmpty cols: ");
+		emptyColumns.forEach(x -> System.out.print(x+" ") );
+		System.out.println();
+		long sum1 = calculateSumShortestPaths(2);
+		System.out.printf("Sum part 1: %d%n", sum1);
 		
-		imageList.forEach(x -> System.out.println(x));
-		galaxyPairs.forEach(x -> System.out.println(x[0] + "-" + x[1]));
-		System.out.printf("Sum part 1: %d%n",sum);
-		
-	}
-
-	private long calculateSumShortestPaths() {
-		long sum = 0;
-		for (int[] pair : galaxyPairs) {
-			sum += shortestPath(pair);
-		}
-		return sum;
-	}
-
-	private int shortestPath(int[] pair) {
-		int[] coord1 = galaxyMap.get(pair[0]);
-		int[] coord2 = galaxyMap.get(pair[1]);
-		
-		return Math.abs(coord2[0]-coord1[0])+ Math.abs(coord2[1]-coord1[1]);
-		
-	}
-
-	private void linkTheGalaxies() {
-		for (int i = 0; i < galaxyMap.size(); i++) {
-			for (int j = i + 1; j < galaxyMap.size(); j++) {
-				galaxyPairs.add(new int[] { i, j });
-			}
-		}
-	}
-
-	private void mapGalaxies() {
-		int galaxyNr = 0;
-		for (int row = 0; row < image.length; row++) {
-			for (int col = 0; col < image[row].length; col++) {
-				if (image[row][col] == '#') {
-					galaxyMap.put(galaxyNr++, new int[] { row, col });
-				}
-			}
-		}
+		long sum2 = calculateSumShortestPaths(1000000);
+		System.out.printf("Sum part 2: %d%n", sum2);
 
 	}
 
-	private void transformListToDoubleArray() {
-		int rows = imageList.size();
-		int columns = imageList.get(0).length();
-		image = new char[rows][columns];
-		for (int i = 0; i < rows; i++) {
-			image[i] = imageList.get(i).toCharArray();
-		}
-
-	}
-
-	private void expandEmptyRows() {
-		int rowSize = imageList.get(0).length();
-		List<Integer> rowsToInsert = new ArrayList<>();
-		StringBuilder sbRow = new StringBuilder();
-		for (int i = 0; i < rowSize; i++) {
-			sbRow.append(".");
-		}
-		String stringRow = sbRow.toString();
-
-		for (int i = 0; i < imageList.size(); i++) {
-			if (!imageList.get(i).contains("#")) {
-				rowsToInsert.add(i);
-			}
-		}
-
-		for (Integer row : rowsToInsert) {
-			imageList.add(row + 1, stringRow);
-		}
-
-	}
-
-	private void expandEmptyColumns() {
+	private void calculateEmptyColumns() {
 		int columnSize = imageList.size();
 		int rowSize = imageList.get(0).length();
-		List<Integer> columnsToInsert = new ArrayList<>();
 		for (int i = 0; i < rowSize; i++) {
 			boolean flag = true;
 			for (int j = 0; j < columnSize; j++) {
@@ -114,21 +51,69 @@ public class Dag11 {
 				}
 			}
 			if (flag) {
-				columnsToInsert.add(i);
+				emptyColumns.add(i);
 			}
 		}
 
-		int columnsInserted = 0;
-		for (Integer column : columnsToInsert) {
-			for (int i = 0; i < columnSize; i++) {
-				String row = imageList.get(i);
-				String newRow = row.substring(0, column + columnsInserted) + "."
-						+ row.substring(column + columnsInserted);
-				imageList.set(i, newRow);
+	}
+
+	private void calculateEmptyRows() {
+		for (int i = 0; i < imageList.size(); i++) {
+			if (!imageList.get(i).contains("#")) {
+				emptyRows.add(i);
 			}
-			columnsInserted++;
 		}
 
+	}
+
+	private long calculateSumShortestPaths(int expandFactor) {
+		long sum = 0;
+		for (int[] galaxyPair : galaxyPairs) {
+			sum += shortestPath(galaxyPair, expandFactor);
+		}
+		return sum;
+	}
+
+	private int shortestPath(int[] galaxyPair, int expandFactor) {
+		int[] coord1 = galaxyMap.get(galaxyPair[0]);
+		int[] coord2 = galaxyMap.get(galaxyPair[1]);
+
+		int nrEmptycolumns = 0, nrEmptyRows = 0;
+
+		for (Integer row : emptyRows) {
+			if (row > Math.min(coord1[0], coord2[0]) && row < Math.max(coord1[0], coord2[0])) {
+				nrEmptyRows++;
+			}
+		}
+		for (Integer col : emptyColumns) {
+			if (col > Math.min(coord1[1], coord2[1]) && col < Math.max(coord1[1], coord2[1])) {
+				nrEmptycolumns++;
+			}
+		}
+		
+		int path = Math.abs(coord2[0] - coord1[0]) + Math.abs(coord2[1] - coord1[1])+(nrEmptycolumns*(expandFactor-1))+(nrEmptyRows*(expandFactor-1));
+		//System.out.printf("%d-%d %d-%d = %d #row %d #col %d%n",coord1[0],coord1[1], coord2[0],coord2[1],path,nrEmptyRows,nrEmptycolumns);
+		return path;
+
+	}
+
+	private void linkTheGalaxies() {
+		for (int i = 0; i < galaxyMap.size() - 1; i++) {
+			for (int j = i + 1; j < galaxyMap.size(); j++) {
+				galaxyPairs.add(new int[] { i, j });
+			}
+		}
+	}
+
+	private void mapGalaxies() {
+		int galaxyNr = 0;
+		for (int row = 0; row < imageList.size(); row++) {
+			for (int col = 0; col < imageList.get(row).length(); col++) {
+				if (imageList.get(row).charAt(col) == '#') {
+					galaxyMap.put(galaxyNr++, new int[] { row, col });
+				}
+			}
+		}
 	}
 
 	private void readFile() {
