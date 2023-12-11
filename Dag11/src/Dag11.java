@@ -89,8 +89,8 @@ public class Dag11 {
 
 		int path = Math.abs(coord2[0] - coord1[0]) + Math.abs(coord2[1] - coord1[1])
 				+ (nrEmptycolumns * (expandFactor - 1)) + (nrEmptyRows * (expandFactor - 1));
-		// System.out.printf("%d-%d %d-%d = %d #row %d #col %d%n",coord1[0],coord1[1],
-		// coord2[0],coord2[1],path,nrEmptyRows,nrEmptycolumns);
+		/*System.out.printf("%d-%d %d-%d = %d #row %d #col %d%n",coord1[0],coord1[1],
+		coord2[0],coord2[1],path,nrEmptyRows,nrEmptycolumns); */
 		return path;
 
 	}
