@@ -23,14 +23,13 @@ public class Dag13 {
 		 */
 
 		for (char[][] pattern : patternList) {
-			System.out.println("************");
-			sum += nrsRowAboveHorizontalReflection(pattern).stream().reduce(Integer::sum).get()*100;
-			//sum += nrsColsLeftVerticalReflection(pattern).stream().reduce(Integer::sum).get();
+			sum += nrsRowAboveHorizontalReflection(pattern) * 100;
+			sum += nrsColsLeftVerticalReflection(pattern);
 		}
-		System.out.println(sum);
+		System.out.printf("Part 1: %d", sum);
 	}
 
-	private List<Integer> nrsColsLeftVerticalReflection(char[][] pattern) {
+	private int nrsColsLeftVerticalReflection(char[][] pattern) {
 		int rows = pattern.length;
 		int cols = pattern[0].length;
 
@@ -44,15 +43,7 @@ public class Dag13 {
 
 	}
 
-	private List<Integer> nrsRowAboveHorizontalReflection(char[][] pattern) {
-		int r = 0;
-		/*for (char[] c : pattern) {
-			System.out.printf("%-3d", r++);
-			System.out.println(c);
-		}*/
-
-		List<Integer> list = new ArrayList<>();
-		list.add(0);
+	private int nrsRowAboveHorizontalReflection(char[][] pattern) {
 		for (int i = 0; i < pattern.length - 1; i++) {
 			if (Arrays.equals(pattern[i], pattern[i + 1])) {
 				int nrRowsToGo = pattern.length - i - 2;
@@ -67,35 +58,14 @@ public class Dag13 {
 					}
 				}
 				if (flag) {
-					list.add(i + 1);
-					System.out.println(i + 1);
+					//System.out.printf("%d ", i + 1);
+					return (i + 1);
+
 				}
 			}
 		}
 
-		for (int i = 1; i < pattern.length - 1; i++) {
-			if (Arrays.equals(pattern[i - 1], pattern[i + 1])) {
-				int nrRowsToGo = pattern.length - i - 1-2;
-				boolean flag = true;
-				for (int check = 1; check <= nrRowsToGo; check++) {
-					if (i -1- check < 0) {
-						break;
-					}
-					flag = Arrays.equals(pattern[i -1 -check], pattern[i + 1 + check]);
-					if (!flag) {
-						break;
-					}
-				}
-				if (flag) {
-					list.add(i);
-					System.out.println(i);
-				}
-			}
-		}
-		
-	
-		System.out.print("\n\n");
-		return list;
+		return 0;
 
 	}
 
