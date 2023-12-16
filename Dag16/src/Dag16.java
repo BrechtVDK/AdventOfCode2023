@@ -8,20 +8,69 @@ import java.util.Set;
 public class Dag16 {
 
 	public static void main(String[] args) {
-		Dag16 d = new Dag16();
+		try {
+			Dag16 d = new Dag16();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private char[][] square = new char[110][110];
 	private char[][] energizedSquare = new char[110][110];
 	private Set<String> set = new HashSet<>();
+	private List<Integer> energiedTilesList = new ArrayList<>();
 
-	public Dag16() {
+	public Dag16() throws InterruptedException {
 		readFile();
-		// initializeEnergizedSquare();
+
 		startBeam();
 		// printSquare(square);
 		// printSquare(energizedSquare);
 		System.out.printf("Sum part 1: %d", countEnergizedTiles());
+		initializeEnergizedSquare();
+		beamAllPossibilites();
+		int max = energiedTilesList.stream().max(Integer::max).get();
+		System.out.printf("Max part 1: %d", max);
+
+	}
+
+	private void beamAllPossibilites() {
+		for (int i = 0; i < square.length; i++) {
+			try {
+				goRight(0, i);
+				energiedTilesList.add(countEnergizedTiles());
+				initializeEnergizedSquare();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				goLeft(square.length - 1, i);
+				energiedTilesList.add(countEnergizedTiles());
+				initializeEnergizedSquare();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				goUp(i, square.length - 1);
+				energiedTilesList.add(countEnergizedTiles());
+				initializeEnergizedSquare();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				goDown(i, 0);
+				energiedTilesList.add(countEnergizedTiles());
+				initializeEnergizedSquare();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	private int countEnergizedTiles() {
@@ -45,11 +94,11 @@ public class Dag16 {
 		}
 	}
 
-	private void startBeam() {
+	private void startBeam() throws InterruptedException {
 		goRight(0, 0);
 	}
 
-	private void goRight(int x, int y) {
+	private void goRight(int x, int y) throws InterruptedException {
 		if (x == square[0].length) {
 			return;
 		}
@@ -60,14 +109,33 @@ public class Dag16 {
 			case '\\' -> goDown(x, y + 1);
 			case '/' -> goUp(x, y - 1);
 			case '|' -> {
-				goUp(x, y - 1);
-				goDown(x, y + 1);
+				Thread thread1 = new Thread(() -> {
+					try {
+						goUp(x, y - 1);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				Thread thread2 = new Thread(() -> {
+					try {
+						goDown(x, y + 1);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				thread1.start();
+				thread2.start();
+				thread1.join();
+				thread2.join();
+
 			}
 			}
 		}
 	}
 
-	private void goLeft(int x, int y) {
+	private void goLeft(int x, int y) throws InterruptedException {
 		if (x == -1) {
 			return;
 		}
@@ -78,14 +146,32 @@ public class Dag16 {
 			case '\\' -> goUp(x, y - 1);
 			case '/' -> goDown(x, y + 1);
 			case '|' -> {
-				goUp(x, y - 1);
-				goDown(x, y + 1);
+				Thread thread1 = new Thread(() -> {
+					try {
+						goUp(x, y - 1);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				Thread thread2 = new Thread(() -> {
+					try {
+						goDown(x, y + 1);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				thread1.start();
+				thread2.start();
+				thread1.join();
+				thread2.join();
 			}
 			}
 		}
 	}
 
-	private void goUp(int x, int y) {
+	private void goUp(int x, int y) throws InterruptedException {
 		if (y == -1) {
 			return;
 		}
@@ -96,15 +182,34 @@ public class Dag16 {
 			case '\\' -> goLeft(x - 1, y);
 			case '/' -> goRight(x + 1, y);
 			case '-' -> {
-				goLeft(x - 1, y);
-				goRight(x + 1, y);
+				Thread thread1 = new Thread(() -> {
+					try {
+						goLeft(x - 1, y);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				Thread thread2 = new Thread(() -> {
+					try {
+						goRight(x + 1, y);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				thread1.start();
+				thread2.start();
+				thread1.join();
+				thread2.join();
+
 			}
 			}
 		}
 
 	}
 
-	private void goDown(int x, int y) {
+	private void goDown(int x, int y) throws InterruptedException {
 		if (y == square.length) {
 			return;
 		}
@@ -115,8 +220,26 @@ public class Dag16 {
 			case '\\' -> goRight(x + 1, y);
 			case '/' -> goLeft(x - 1, y);
 			case '-' -> {
-				goLeft(x - 1, y);
-				goRight(x + 1, y);
+				Thread thread1 = new Thread(() -> {
+					try {
+						goLeft(x - 1, y);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				Thread thread2 = new Thread(() -> {
+					try {
+						goRight(x + 1, y);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				thread1.start();
+				thread2.start();
+				thread1.join();
+				thread2.join();
 			}
 			}
 		}
